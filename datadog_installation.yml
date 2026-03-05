@@ -1,0 +1,38 @@
+# This is the playbook to onboard datadog into our 2 db and ws server
+---
+- name: install and start datadog Agent
+  hosts: all
+  become: yes
+  vars:
+    dd_api_key: a051942312cda8191df62a021c111ca5
+    dd_site: "datadoghq.com"
+    dd_env: dd
+tasks:
+    - name: install curl
+      apt:
+        name: curl
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+- name: download datadog Agent
+      get_url:
+        url: https://install.datadoghq.com/scripts/install_script_agent7.sh
+        dest: /tmp/install_datadog.sh
+        mode: "0755"
+- name: install datadog Agent
+      environment:
+        DD_API_KEY: "{{ dd_api_key }}"
+        DD_SITE: "{{ dd_site }}"
+        DD_ENV: "{{ dd_env }}"
+      command: bash /tmp/install_datadog.sh
+      args:
+        creates: /usr/bin/datadog-agent
+- name: reload systemd
+      systemd:
+        daemon_reload: yes
+- name: start datadog service agent
+      systemd:
+        name: datadog-agent
+        state: started
+        enabled: yes
+

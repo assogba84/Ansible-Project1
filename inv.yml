@@ -1,0 +1,16 @@
+# This is our yml inventory file with 2 nodes: db and ws servers and their public ip
+
+[db]
+54.226.232.36
+
+[ws]
+54.198.178.240
+
+[db:vars]
+ansible_user=ubuntu
+
+[ws:vars]
+ansible_user=ec2-user
+
+
+
